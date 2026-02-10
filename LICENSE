@@ -1,24 +1,352 @@
-This is free and unencumbered software released into the public domain.
+  {/* HEADER SECTION */}
+      <header className="student-header">
+        <div className="profile-section">
+          <div className="profile-pic">
+            <img src="/profile.jpg" alt="Ranjan Kumar" />
+            <button className="change-pic-btn">📷 Change Photo</button>
+          </div>
+          <div className="profile-info">
+            <h1>{myInfo.name}</h1>
+            <p className="location">📍 {myInfo.location}</p>
+            <p className="education">🎓 {myInfo.education} | {myInfo.college}</p>
+            <p className="stream">📚 {myInfo.stream} - {myInfo.year}</p>
+          </div>
+        </div>
+        
+        <div className="contact-buttons">
+          <button className="whatsapp-btn" 
+            onClick={() => window.open(`https://wa.me/91${myInfo.phone}`)}>
+            💬 WhatsApp
+          </button>
+          <button className="call-btn" 
+            onClick={() => window.location.href = `tel:${myInfo.phone}`}>
+            📞 Call Now
+          </button>
+          <button className="email-btn"
+            onClick={() => window.location.href = `mailto:${myInfo.email}`}>
+            📧 Email
+          </button>
+        </div>
+      </header>
 
-Anyone is free to copy, modify, publish, use, compile, sell, or
-distribute this software, either in source code form or as a compiled
-binary, for any purpose, commercial or non-commercial, and by any
-means.
+      {/* EDIT PERSONAL INFO SECTION */}
+      <section className="edit-info-section">
+        <h2>✏️ Edit Your Information</h2>
+        <div className="info-editor">
+          {Object.entries(myInfo).map(([key, value]) => (
+            <div key={key} className="info-field">
+              <label>{key.replace(/([A-Z])/g, ' $1').toUpperCase()}</label>
+              <input 
+                type="text" 
+                value={value} 
+                onChange={(e) => setMyInfo({...myInfo, [key]: e.target.value})}
+                placeholder={`Enter ${key}`}
+              />
+            </div>
+          ))}
+          <button className="save-info-btn"
+            onClick={() => alert('Information saved successfully!')}>
+            💾 Save All Information
+          </button>
+        </div>
+      </section>
 
-In jurisdictions that recognize copyright laws, the author or authors
-of this software dedicate any and all copyright interest in the
-software to the public domain. We make this dedication for the benefit
-of the public at large and to the detriment of our heirs and
-successors. We intend this dedication to be an overt act of
-relinquishment in perpetuity of all present and future rights to this
-software under copyright law.
+      {/* PHOTO GALLERY SECTION */}
+      <section className="gallery-section">
+        <h2>📸 My Photo Gallery</h2>
+        
+        <div className="gallery-controls">
+          <input 
+            type="file" 
+            multiple 
+            accept="image/*" 
+            onChange={handleImageUpload}
+            id="image-upload"
+            style={{ display: 'none' }}
+          />
+          <label htmlFor="image-upload" className="upload-btn">
+            📁 Upload Photos
+          </label>
+          
+          <button className="arrange-btn"
+            onClick={() => alert('Drag and drop to arrange photos')}>
+            🔄 Arrange Photos
+          </button>
+          
+          <button className="delete-all-btn"
+            onClick={() => {
+              if (window.confirm('Delete all photos?')) {
+                setGallery([]);
+              }
+            }}>
+            🗑️ Delete All
+          </button>
+        </div>
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+        {/* GALLERY DISPLAY */}
+        <div className="gallery-grid">
+          {gallery.length === 0 ? (
+            <div className="empty-gallery">
+              <p>📷 No photos uploaded yet</p>
+              <p>Click "Upload Photos" to add your pictures</p>
+            </div>
+          ) : (
+            gallery.map((image, index) => (
+              <div key={image.id} className="gallery-item">
+                <div className="image-container">
+                  <img src={image.url} alt={image.name} />
+                  <div className="image-overlay">
+                    <button className="edit-btn"
+                      onClick={() => {
+                        const newCaption = prompt("Enter caption:", image.caption);
+                        if (newCaption !== null) {
+                          editImageCaption(image.id, newCaption);
+                        }
+                      }}>
+                      ✏️ Edit
+                    </button>
+                    <button className="delete-btn"
+                      onClick={() => deleteImage(image.id)}>
+                      ❌ Delete
+                    </button>
+                  </div>
+                </div>
+                <input 
+                  type="text" 
+                  value={image.caption}
+                  onChange={(e) => editImageCaption(image.id, e.target.value)}
+                  placeholder="Add caption..."
+                  className="caption-input"
+                />
+                <div className="image-actions">
+                  <button className="move-up-btn"
+                    onClick={() => {
+                      if (index > 0) {
+                        const newGallery = [...gallery];
+                        [newGallery[index], newGallery[index-1]] = 
+                        [newGallery[index-1], newGallery[index]];
+                        setGallery(newGallery);
+                      }
+                    }}>
+                    ⬆️ Move Up
+                  </button>
+                  <button className="move-down-btn"
+                    onClick={() => {
+                      if (index < gallery.length - 1) {
+                        const newGallery = [...gallery];
+                        [newGallery[index], newGallery[index+1]] = 
+                        [newGallery[index+1], newGallery[index]];
+                        setGallery(newGallery);
+                      }
+                    }}>
+                    ⬇️ Move Down
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
 
-For more information, please refer to <https://unlicense.org>
+      {/* MY BLOG SECTION */}
+      <section className="blog-section">
+        <h2>📝 My Blog/Diary</h2>
+        
+        <div className="add-blog-form">
+          <h3>➕ Add New Blog Post</h3>
+          <input 
+            type="text" 
+            placeholder="Blog Title" 
+            value={newBlog.title}
+            onChange={(e) => setNewBlog({...newBlog, title: e.target.value})}
+          />
+          <textarea 
+            placeholder="Write your blog content here..." 
+            rows="5"
+            value={newBlog.content}
+            onChange={(e) => setNewBlog({...newBlog, content: e.target.value})}
+          ></textarea>
+          <button onClick={addBlog} className="publish-btn">
+            📢 Publish Blog
+          </button>
+        </div>
+
+        {/* BLOG POSTS */}
+        <div className="blog-posts">
+          <h3>My Blog Posts ({blogs.length})</h3>
+          {blogs.map(blog => (
+            <div key={blog.id} className="blog-card">
+              <div className="blog-header">
+                <h4>{blog.title}</h4>
+                <span className="blog-date">{blog.date}</span>
+              </div>
+              <p className="blog-content">{blog.content}</p>
+              <div className="blog-footer">
+                <button className="like-btn"
+                  onClick={() => {
+                    setBlogs(blogs.map(b => 
+                      b.id === blog.id ? {...b, likes: b.likes + 1} : b
+                    ));
+                  }}>
+                  👍 Like ({blog.likes})
+                </button>
+                <button className="edit-blog-btn"
+                  onClick={() => {
+                    const newTitle = prompt("Edit title:", blog.title);
+                    const newContent = prompt("Edit content:", blog.content);
+                    if (newTitle && newContent) {
+                      setBlogs(blogs.map(b => 
+                        b.id === blog.id 
+                          ? {...b, title: newTitle, content: newContent} 
+                          : b
+                      ));
+                    }
+                  }}>
+                  ✏️ Edit
+                </button>
+                <button className="delete-blog-btn"
+                  onClick={() => {
+                    if (window.confirm("Delete this blog?")) {
+                      setBlogs(blogs.filter(b => b.id !== blog.id));
+                    }
+                  }}>
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SKILLS & HOBBIES */}
+      <section className="skills-section">
+        <h2>🌟 My Skills & Hobbies</h2>
+        
+        <div className="skills-container">
+          <div className="hobbies-list">
+            <h3>🎯 My Hobbies</h3>
+            <div className="hobby-items">
+              {myInfo.hobbies.map((hobby, index) => (
+                <div key={index} className="hobby-item">
+                  <span>{hobby}</span>
+                  <button className="remove-hobby"
+                    onClick={() => {
+                      const newHobbies = [...myInfo.hobbies];
+                      newHobbies.splice(index, 1);
+                      setMyInfo({...myInfo, hobbies: newHobbies});
+                    }}>
+                    ❌
+                  </button>
+                </div>
+              ))}
+              <div className="add-hobby">
+                <input 
+                  type="text" 
+                  id="new-hobby"
+                  placeholder="Add new hobby"
+                />
+                <button onClick={() => {
+                  const input = document.getElementById('new-hobby');
+                  if (input.value.trim()) {
+                    setMyInfo({
+                      ...myInfo, 
+                      hobbies: [...myInfo.hobbies, input.value.trim()]
+                    });
+                    input.value = '';
+                  }
+                }}>
+                  ➕ Add
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="skills-list">
+            <h3>💪 My Skills</h3>
+            <div className="skill-items">
+              {myInfo.skills.map((skill, index) => (
+                <div key={index} className="skill-item">
+                  <span>{skill}</span>
+                  <button className="remove-skill"
+                    onClick={() => {
+                      const newSkills = [...myInfo.skills];
+                      newSkills.splice(index, 1);
+                      setMyInfo({...myInfo, skills: newSkills});
+                    }}>
+                    ❌
+                  </button>
+                </div>
+              ))}
+              <div className="add-skill">
+                <input 
+                  type="text" 
+                  id="new-skill"
+                  placeholder="Add new skill"
+                />
+                <button onClick={() => {
+                  const input = document.getElementById('new-skill');
+                  if (input.value.trim()) {
+                    setMyInfo({
+                      ...myInfo, 
+                      skills: [...myInfo.skills, input.value.trim()]
+                    });
+                    input.value = '';
+                  }
+                }}>
+                  ➕ Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT SECTION */}
+      <section className="contact-section">
+        <h2>📞 Contact Me</h2>
+        <div className="contact-methods">
+          <div className="contact-card">
+            <h4>📱 Phone</h4>
+            <p>{myInfo.phone}</p>
+            <button className="call-now-btn"
+              onClick={() => window.location.href = `tel:${myInfo.phone}`}>
+              Call Now
+            </button>
+          </div>
+          
+          <div className="contact-card">
+            <h4>📧 Email</h4>
+            <p>{myInfo.email}</p>
+            <button className="email-now-btn"
+              onClick={() => window.location.href = `mailto:${myInfo.email}`}>
+              Send Email
+            </button>
+          </div>
+          
+          <div className="contact-card">
+            <h4>📍 Location</h4>
+            <p>{myInfo.location}</p>
+            <button className="map-btn"
+              onClick={() => window.open(`https://maps.google.com/?q=${myInfo.location}`)}>
+              View on Map
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="website-footer">
+        <p>© 2024 Ranjan Kumar - Student Personal Website</p>
+        <p>Made with ❤️ from Bihar Sharif, Nalanda</p>
+        <div className="social-links">
+          <button className="fb-btn">Facebook</button>
+          <button className="insta-btn">Instagram</button>
+          <button className="twitter-btn">Twitter</button>
+          <button className="linkedin-btn">LinkedIn</button>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default RanjanStudentWebsite;
